@@ -50,9 +50,11 @@ class SortingVisualizer:
         selection = self.option_var.get()
         if selection == 'Select Algorithm':
             return
+        # Temporarly disable buttons and array slider during sorting
         self.sort_button.config(state='disabled')
         self.gen_button.config(state='disabled')
         self.s1.state(['disabled'])
+
         if selection == 'Bubble Sort':
             bubble_sort(self.array)
         elif selection == 'Quicksort':
@@ -66,7 +68,7 @@ class SortingVisualizer:
         # re-enable buttons after sorting is finished
         self.sort_button.config(state='normal')
         self.gen_button.config(state='normal')
-        self.s1.state(['normal'])
+        self.s1.state(['!disabled'])
 
     def new_array(self):
         label = str(self.num_operations)
@@ -94,26 +96,26 @@ class SortingVisualizer:
         label = str(self.num_operations)
         self.num_label = tk.Label(self.top_frame, text=label)
         self.num_label.grid(row=1, column=1, sticky='w')
-
-        self.sort_canvas = tk.Canvas(self.root, width=600, height=450)
-        self.sort_canvas.create_line(15,15,585,15)
-        self.sort_canvas.grid(row=1)
-
         bar_gap = self.bar_width + 3
         start_x = 30
-        start_y = 15
+        start_y = 425
+
+        self.sort_canvas = tk.Canvas(self.root, width=600, height=450)
+        self.sort_canvas.create_line(15,start_y,585,start_y)
+        self.sort_canvas.grid(row=1)
+
         self.bars = []
         for i in range(len(array)):
             x1 = start_x + self.bar_width
-            y1 = start_y + array[i]
+            y1 = start_y - array[i]*2
             if not sort_done and i != bar_a and i != bar_b:
-                self.bars.append(self.sort_canvas.create_rectangle(start_x, start_y, x1, y1*2, fill='pink'))
+                self.bars.append(self.sort_canvas.create_rectangle(start_x, start_y, x1, y1, fill='pink'))
             elif not sort_done and i == bar_a or i == bar_b:
-                self.bars.append(self.sort_canvas.create_rectangle(start_x, start_y, x1, y1*2, fill='RoyalBlue'))
+                self.bars.append(self.sort_canvas.create_rectangle(start_x, start_y, x1, y1, fill='RoyalBlue'))
             else:
-                self.bars.append(self.sort_canvas.create_rectangle(start_x, start_y, x1, y1*2, fill='green'))
+                self.bars.append(self.sort_canvas.create_rectangle(start_x, start_y, x1, y1, fill='green'))
             if not sort_done and i == pivot:
-                self.bars.append(self.sort_canvas.create_rectangle(start_x, start_y, x1, y1*2, fill='yellow'))
+                self.bars.append(self.sort_canvas.create_rectangle(start_x, start_y, x1, y1, fill='yellow'))
             start_x = start_x + bar_gap
 
     def blip_canvas(self, array, sort_done, i=None, j=None, pivot=None):
@@ -125,7 +127,14 @@ class SortingVisualizer:
     def start(self):
         tk.mainloop()
 
-
+def bubble_sort(array):
+    n = len(array)
+    for i in range(n):
+        for j in range(n-i-1):
+            app.blip_canvas(array, False, j, j+1)  # Update the array displayed on screen
+            if array[j] > array[j+1]:
+                array[j], array[j+1] = array[j+1], array[j]
+                app.num_operations += 1
 
 if __name__ == '__main__':
     app = SortingVisualizer()
