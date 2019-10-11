@@ -5,17 +5,16 @@ import random
 class SortingVisualizer:
 
     def __init__(self):
+        # Set window propeties
         self.root = tk.Tk()
         self.root.wm_title("Sorting Visualizer")
         self.root.wm_minsize(width=600, height=500)
         self.root.wm_resizable(width=False, height=False)
 
         self.sort_canvas = tk.Canvas(self.root)
-        self.num_label = None
-        self.num_operations = 0
-        self.bars = []
-        self.bar_width = 0
-        self.bar_gap = 0
+        self.num_label = None       # Initialize Label of number of operation to be None
+        self.num_operations = 0     # Number of operations done during a single sort
+        self.bars = []              # List of bar objects being displayed
 
         self.top_frame = tk.Frame(self.root)
         self.top_frame.grid(row=0, sticky='w')
@@ -27,7 +26,8 @@ class SortingVisualizer:
         self.s1.set(15)
         self.s1.grid(row=0, column=1)
 
-        self.sort_options = ['Select Algorithm', 'Bubble Sort', 'Quicksort', 'Merge Sort', 'Heap Sort']
+        # Set properties for the Select Algorithm drop down menu
+        self.sort_options = ['Select Algorithm', 'Bubble Sort', 'Quicksort', 'Merge Sort', 'Heap Sort', 'Insertion Sort']
         self.option_var = tk.StringVar()
         self.option_drop = ttk.OptionMenu(self.top_frame, self.option_var, *self.sort_options)
         self.option_drop.config(width=15)
@@ -40,7 +40,9 @@ class SortingVisualizer:
         self.num_op_label.grid(row=1, column=0)
 
     def set_array_properties(self, val):
-        # self: The SortingVisualizer object
+        # Set the properties of the array to be sorted and generate a new array with those properties
+            # self: The SortingVisualizer object
+            # val: The current value the slider is set at
         val = round(float(val))
         self.array_size = val
         self.speed = 1000//val
@@ -49,7 +51,7 @@ class SortingVisualizer:
 
     def sort(self):
         # Get selected sorting algorithm from OptionMenu and calls that selected sorting algorithm
-        # self: The SortingVisualizer object
+            # self: The SortingVisualizer object
 
         selection = self.option_var.get()
         if selection == 'Select Algorithm':
@@ -67,6 +69,8 @@ class SortingVisualizer:
             mergeSort(self.array)
         elif selection == 'Heap Sort':
             heapSort(self.array)
+        elif selection == 'Insertion Sort':
+            insertionSort(self.array)
 
         self.draw_canvas(self.array, True)  # Display the sorted array as completed
         # re-enable buttons after sorting is finished
@@ -76,7 +80,7 @@ class SortingVisualizer:
 
     def new_array(self):
         # Sets up the window for newly generated array
-        # self: The SortingVisualizer object
+            # self: The SortingVisualizer object
 
         label = str(self.num_operations)
         if self.num_label == None:
@@ -91,7 +95,7 @@ class SortingVisualizer:
 
     def generate_array(self):
         # Generates a new random array of length denoted by the scale
-        # self: The SortingVisualizer object
+            # self: The SortingVisualizer object
         self.array = []
         self.num_operations = 0
         i = 0
@@ -102,12 +106,12 @@ class SortingVisualizer:
 
     def draw_canvas(self, array, sort_done, bar_a=None, bar_b=None, pivot=None):
         # Draws the Bars that are being sorted on the canvas
-        # self: The sortingVisualizer object
-        # array: The array to be displayed
-        # sort_done: If the array sorting has been completed
-        # bar_a: The index of a current bar being compared
-        # bar_b: The index of a current bar being compared
-        # pivot: The index of the bar acting as the piviot value
+            # self: The sortingVisualizer object
+            # array: The array to be displayed
+            # sort_done: If the array sorting has been completed
+            # bar_a: The index of a current bar being compared
+            # bar_b: The index of a current bar being compared
+            # pivot: The index of the bar acting as the piviot value
 
         self.sort_canvas.destroy()
         self.num_label.destroy()
@@ -171,6 +175,46 @@ def partition(array, low, high):
     app.draw_canvas(array, False, high, i+1)  # Update the array displayed on screen
     app.num_operations += 1
     return(i+1)
+
+def heapSort(array):
+    n = len(array)
+
+    # Build Maxheap
+    for i in range(n, -1, -1):
+        heapify(array, n, i)
+    for i in range(n-1, 0, -1):
+        array[i], array[0] = array[0], array[i]
+        app.num_operations += 1
+        heapify(array, i, 0)
+
+def heapify(array, n, i):
+    largest = i
+    left = 2 * i + 1
+    right = 2 * i + 2
+
+    if left < n and array[i] < array[left]:
+        largest = left
+    if right < n and array[largest] < array[right]:
+        largest = right
+
+    if largest != i:
+        array[largest], array[i] = array[i], array[largest]
+        app.num_operations += 1
+        app.draw_canvas(array, False, largest, i)  # Update the array displayed on screen
+        heapify(array, n, largest)
+
+def insertionSort(array):
+    for i in range(1, len(array)):
+        key = array[i]
+
+        j = i-1
+        while j >= 0 and key < array[j]:
+            array[j+1] = array[j]
+            app.draw_canvas(array, False, j+1, j, i)
+            app.num_operations += 1
+
+            j -= 1
+        array[j+1] = key
 
 if __name__ == '__main__':
     app = SortingVisualizer()
