@@ -33,20 +33,24 @@ class SortingVisualizer:
         self.option_drop.config(width=15)
         self.option_drop.grid(row=0, column=3, sticky='ew')
 
-        self.sort_button = ttk.Button(self.top_frame, text="Sort", command=self.get_select)
+        self.sort_button = ttk.Button(self.top_frame, text="Sort", command=self.sort)
         self.sort_button.grid(row=0, column=4, sticky='w')
 
         self.num_op_label = tk.Label(self.top_frame, text="Number of Operations: ")
         self.num_op_label.grid(row=1, column=0)
 
     def set_array_properties(self, val):
+        # self: The SortingVisualizer object
         val = round(float(val))
         self.array_size = val
         self.speed = 1000//val
         self.bar_width = (550-(3*(val-1)))//val
         self.new_array()
 
-    def get_select(self):
+    def sort(self):
+        # Get selected sorting algorithm from OptionMenu and calls that selected sorting algorithm
+        # self: The SortingVisualizer object
+
         selection = self.option_var.get()
         if selection == 'Select Algorithm':
             return
@@ -64,13 +68,16 @@ class SortingVisualizer:
         elif selection == 'Heap Sort':
             heapSort(self.array)
 
-        self.blip_canvas(self.array, True)  # Display the sorted array as completed
+        self.draw_canvas(self.array, True)  # Display the sorted array as completed
         # re-enable buttons after sorting is finished
         self.sort_button.config(state='normal')
         self.gen_button.config(state='normal')
         self.s1.state(['!disabled'])
 
     def new_array(self):
+        # Sets up the window for newly generated array
+        # self: The SortingVisualizer object
+
         label = str(self.num_operations)
         if self.num_label == None:
             self.num_label = tk.Label(self.top_frame, text=label)
@@ -80,9 +87,11 @@ class SortingVisualizer:
         self.num_label.grid(row=1, column=1, sticky='w')
         
         self.generate_array()
-        self.blip_canvas(self.array, False)
+        self.draw_canvas(self.array, False)
 
     def generate_array(self):
+        # Generates a new random array of length denoted by the scale
+        # self: The SortingVisualizer object
         self.array = []
         self.num_operations = 0
         i = 0
@@ -92,6 +101,15 @@ class SortingVisualizer:
             i += 1
 
     def draw_canvas(self, array, sort_done, bar_a=None, bar_b=None, pivot=None):
+        # Draws the Bars that are being sorted on the canvas
+        # self: The sortingVisualizer object
+        # array: The array to be displayed
+        # sort_done: If the array sorting has been completed
+        # bar_a: The index of a current bar being compared
+        # bar_b: The index of a current bar being compared
+        # pivot: The index of the bar acting as the piviot value
+
+        self.sort_canvas.destroy()
         self.num_label.destroy()
         label = str(self.num_operations)
         self.num_label = tk.Label(self.top_frame, text=label)
@@ -118,9 +136,6 @@ class SortingVisualizer:
                 self.bars.append(self.sort_canvas.create_rectangle(start_x, start_y, x1, y1, fill='yellow'))
             start_x = start_x + bar_gap
 
-    def blip_canvas(self, array, sort_done, i=None, j=None, pivot=None):
-        self.sort_canvas.destroy()
-        self.draw_canvas(array, sort_done, i, j, pivot)
         self.root.update()
         self.root.after(self.speed)
 
@@ -131,10 +146,31 @@ def bubble_sort(array):
     n = len(array)
     for i in range(n):
         for j in range(n-i-1):
-            app.blip_canvas(array, False, j, j+1)  # Update the array displayed on screen
+            app.draw_canvas(array, False, j, j+1)  # Update the array displayed on screen
             if array[j] > array[j+1]:
                 array[j], array[j+1] = array[j+1], array[j]
                 app.num_operations += 1
+
+def quickSort(array, low, high):
+    if low < high:
+        pivot = partition(array, low, high)
+        quickSort(array, low, pivot-1)
+        quickSort(array, pivot+1, high)
+
+def partition(array, low, high):
+    i = low-1
+    pivot = array[high]
+
+    for j in range(low, high):
+        if array[j] <= pivot:
+            i+= 1
+            array[j], array[i], = array[i], array[j]
+            app.draw_canvas(array, False, j, i, high)  # Update the array displayed on screen
+            app.num_operations += 1
+    array[high], array[i+1] = array[i+1], array[high]
+    app.draw_canvas(array, False, high, i+1)  # Update the array displayed on screen
+    app.num_operations += 1
+    return(i+1)
 
 if __name__ == '__main__':
     app = SortingVisualizer()
