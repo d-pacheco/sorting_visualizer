@@ -36,6 +36,9 @@ class SortingVisualizer:
         self.sort_button = ttk.Button(self.top_frame, text="Sort", command=self.get_select)
         self.sort_button.grid(row=0, column=4, sticky='w')
 
+        self.num_op_label = tk.Label(self.top_frame, text="Number of Operations: ")
+        self.num_op_label.grid(row=1, column=0)
+
     def set_array_properties(self, val):
         val = round(float(val))
         self.array_size = val
@@ -47,8 +50,9 @@ class SortingVisualizer:
         selection = self.option_var.get()
         if selection == 'Select Algorithm':
             return
-        self.sort_button.config(state='disable')
-        self.gen_button.config(state='disable')
+        self.sort_button.config(state='disabled')
+        self.gen_button.config(state='disabled')
+        self.s1.state(['disabled'])
         if selection == 'Bubble Sort':
             bubble_sort(self.array)
         elif selection == 'Quicksort':
@@ -58,19 +62,20 @@ class SortingVisualizer:
         elif selection == 'Heap Sort':
             heapSort(self.array)
 
-        self.blip_canvas(self.array, True)
+        self.blip_canvas(self.array, True)  # Display the sorted array as completed
         # re-enable buttons after sorting is finished
         self.sort_button.config(state='normal')
         self.gen_button.config(state='normal')
+        self.s1.state(['normal'])
 
     def new_array(self):
-        label = "Number of Operations: " + str(self.num_operations)
+        label = str(self.num_operations)
         if self.num_label == None:
             self.num_label = tk.Label(self.top_frame, text=label)
         else:
             self.num_label.destroy()
             self.num_label = tk.Label(self.top_frame, text=label)
-        self.num_label.grid(row=1, columnspan=2)
+        self.num_label.grid(row=1, column=1, sticky='w')
         
         self.generate_array()
         self.blip_canvas(self.array, False)
@@ -82,17 +87,17 @@ class SortingVisualizer:
         while i < self.array_size:
             height = random.randint(15, 200)
             self.array.append(height)
-            i = i + 1
+            i += 1
 
     def draw_canvas(self, array, sort_done, bar_a=None, bar_b=None, pivot=None):
         self.num_label.destroy()
-        label = "Number of Operations: " + str(self.num_operations)
+        label = str(self.num_operations)
         self.num_label = tk.Label(self.top_frame, text=label)
-        self.num_label.grid(row=1, columnspan=2)
+        self.num_label.grid(row=1, column=1, sticky='w')
 
         self.sort_canvas = tk.Canvas(self.root, width=600, height=450)
+        self.sort_canvas.create_line(15,15,585,15)
         self.sort_canvas.grid(row=1)
-        self.sort_canvas.create_line(15, 15, 585, 15)
 
         bar_gap = self.bar_width + 3
         start_x = 30
@@ -112,7 +117,7 @@ class SortingVisualizer:
             start_x = start_x + bar_gap
 
     def blip_canvas(self, array, sort_done, i=None, j=None, pivot=None):
-        self.sort_canvas.delete(self.bars)
+        self.sort_canvas.destroy()
         self.draw_canvas(array, sort_done, i, j, pivot)
         self.root.update()
         self.root.after(self.speed)
