@@ -22,12 +22,15 @@ class SortingVisualizer:
         self.gen_button = ttk.Button(self.top_frame, text="Generate New Array", command=self.new_array)
         self.gen_button.grid(row=0, column=0)
 
+        self.array_label = tk.Label(self.top_frame, text="Array Size & Sorting Speed")
+        self.array_label.grid(row=0, column=1)
+
         self.s1 = ttk.Scale(self.top_frame, orient='horizontal', from_=4, to=61, command=self.set_array_properties)
         self.s1.set(15)
-        self.s1.grid(row=0, column=1)
+        self.s1.grid(row=0, column=2)
 
         # Set properties for the Select Algorithm drop down menu
-        self.sort_options = ['Select Algorithm', 'Bubble Sort', 'Quicksort', 'Merge Sort', 'Heap Sort', 'Insertion Sort']
+        self.sort_options = ['Select Algorithm', 'Bubble Sort', 'Quicksort', 'Heap Sort', 'Insertion Sort']
         self.option_var = tk.StringVar()
         self.option_drop = ttk.OptionMenu(self.top_frame, self.option_var, *self.sort_options)
         self.option_drop.config(width=15)
@@ -45,7 +48,7 @@ class SortingVisualizer:
             # val: The current value the slider is set at
         val = round(float(val))
         self.array_size = val
-        self.speed = 1000//val
+        self.speed = 2000//val
         self.bar_width = (550-(3*(val-1)))//val
         self.new_array()
 
@@ -65,8 +68,6 @@ class SortingVisualizer:
             bubble_sort(self.array)
         elif selection == 'Quicksort':
             quickSort(self.array, 0, len(self.array)-1)
-        elif selection == 'Merge Sort':
-            mergeSort(self.array)
         elif selection == 'Heap Sort':
             heapSort(self.array)
         elif selection == 'Insertion Sort':
