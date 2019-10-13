@@ -11,6 +11,11 @@ I wanted to refine my knowledge of sorting algorithms and create an application 
 
 The application currents offers visualization for Bubble Sort, QuickSort, Heap Sort, and Insertion Sort. You are able to use the slider at the top of the application to change the size of the array which will also change the speed the array is sorted at.
 
+# Videos
+![](gifs/Bubble%20Sort.gif)
+![](gifs/QuickSort.gif)
+![](gifs/Heap%20Sort.gif)
+![](gifs/Insertion%20Sort.gif)
 
 ## License
 
